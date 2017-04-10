@@ -56,6 +56,14 @@ class SlackJsonParser
     end
   end
 
+  def show_export_message(message)
+    print "#{message}..."
+    show_wait_cursor{
+      sleep rand(4)+2
+    }
+    system "clear"
+  end
+
   private
 
   def generate_json_pages(response, path)
@@ -70,4 +78,20 @@ class SlackJsonParser
     end
   end
 
+  def show_wait_cursor(fps=10)
+    chars = %w[| / - \\]
+    delay = 1.0/fps
+    iter = 0
+    spinner = Thread.new do
+      while iter do
+        print chars[(iter+=1) % chars.length]
+        sleep delay
+        print "\b"
+      end
+    end
+    yield.tap{
+      iter = false
+      spinner.join
+    }
+  end
 end
